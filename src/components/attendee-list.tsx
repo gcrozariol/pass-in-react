@@ -14,13 +14,31 @@ import { Table } from './table/table'
 import { TableHeader } from './table/table-header'
 import { TableCell } from './table/table-cell'
 import { TableRow } from './table/table-row'
-import { attendees } from '../data/attendees'
 
 dayjs.extend(relativeTime)
+
+interface Attendees {
+  id: string
+  name: string
+  email: string
+  createdAt: string
+  checkedInAt: string | null
+}
 
 export function AttendeeList() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [attendees, setAttendees] = useState<Attendees[]>([])
+
+  useEffect(() => {
+    fetch(
+      'http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees',
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setAttendees(data.attendees)
+      })
+  }, [])
 
   const totalPages = Math.ceil(attendees.length / 10)
 
@@ -43,10 +61,6 @@ export function AttendeeList() {
   function goToLastPage() {
     setPage(totalPages)
   }
-
-  useEffect(() => {
-    console.log(search)
-  }, [search])
 
   return (
     <div className="flex flex-col gap-4">
@@ -81,7 +95,7 @@ export function AttendeeList() {
         </thead>
 
         <tbody>
-          {attendees.slice((page - 1) * 10, page * 10).map((attendee) => {
+          {attendees.map((attendee) => {
             return (
               <TableRow key={attendee.id} className=" hover:bg-white/5">
                 <TableCell>
@@ -96,11 +110,19 @@ export function AttendeeList() {
                     <span className="font-semibold text-white">
                       {attendee.name}
                     </span>
-                    <span>{attendee.email}</span>
+                    <span>{attendee.email.toLocaleLowerCase()}</span>
                   </div>
                 </TableCell>
                 <TableCell>{dayjs().to(attendee.createdAt)}</TableCell>
-                <TableCell>{dayjs().to(attendee.checkedInAt)}</TableCell>
+                <TableCell>
+                  {attendee.checkedInAt ? (
+                    dayjs().to(attendee.checkedInAt)
+                  ) : (
+                    <span className="text-zinc-400">
+                      Haven&apos;t checked in yet
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <IconButton transparent>
                     <MoreHorizontal className="size-4" />

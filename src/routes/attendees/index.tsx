@@ -9,11 +9,13 @@ import {
   MoreHorizontal,
   Search,
 } from 'lucide-react'
+
 import { IconButton } from './components/icon-button'
+
 import { Table } from './components/table/table'
-import { TableHeader } from './components/table/table-header'
-import { TableCell } from './components/table/table-cell'
 import { TableRow } from './components/table/table-row'
+import { TableCell } from './components/table/table-cell'
+import { TableHeader } from './components/table/table-header'
 
 dayjs.extend(relativeTime)
 

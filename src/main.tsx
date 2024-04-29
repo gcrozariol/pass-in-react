@@ -8,11 +8,13 @@ import { Events } from './routes/events'
 import { Attendees } from './routes/attendees'
 
 import './index.css'
+import ErrorPage from './error-page'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: '/',

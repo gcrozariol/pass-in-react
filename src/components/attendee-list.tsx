@@ -26,40 +26,89 @@ interface Attendees {
 }
 
 export function AttendeeList() {
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState(() => {
+    const url = new URL(window.location.toString())
+
+    if (url.searchParams.has('search')) {
+      return url.searchParams.get('search') ?? ''
+    }
+
+    return ''
+  })
+
+  const [page, setPage] = useState(() => {
+    const url = new URL(window.location.toString())
+
+    if (url.searchParams.has('page')) {
+      return Number(url.searchParams.get('page'))
+    }
+
+    return 1
+  })
+
+  const [total, setTotal] = useState(0)
   const [attendees, setAttendees] = useState<Attendees[]>([])
 
   useEffect(() => {
-    fetch(
+    const url = new URL(
       'http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees',
     )
-      .then((res) => res.json())
-      .then((data) => {
-        setAttendees(data.attendees)
-      })
-  }, [])
 
-  const totalPages = Math.ceil(attendees.length / 10)
+    url.searchParams.set('pageIndex', `${page - 1}`)
+
+    if (search.length > 0) {
+      url.searchParams.set('query', search)
+    }
+
+    fetch(url)
+      .then((res) => res.json())
+      .then(
+        ({ attendees, total }: { attendees: Attendees[]; total: number }) => {
+          setAttendees(attendees)
+          setTotal(total)
+        },
+      )
+  }, [page, search])
+
+  const totalPages = Math.ceil(total / 10)
+
+  function setCurrentPage(page: number) {
+    const url = new URL(window.location.toString())
+
+    url.searchParams.set('page', String(page))
+    window.history.pushState({}, '', url)
+
+    setPage(page)
+  }
+
+  function setCurrentSearch(search: string) {
+    const url = new URL(window.location.toString())
+
+    url.searchParams.set('search', search)
+    window.history.pushState({}, '', url)
+
+    setSearch(search)
+  }
 
   function onSearchChanged(event: ChangeEvent<HTMLInputElement>) {
-    setSearch(event.target.value)
+    setCurrentSearch(event.target.value)
+    setCurrentPage(1)
   }
 
   function goToFirstPage() {
-    setPage(1)
+    setCurrentPage(1)
   }
 
   function goToNextPage() {
-    setPage((prev) => prev + 1)
+    setCurrentPage(page + 1)
   }
 
   function goToPreviousPage() {
-    setPage((prev) => prev - 1)
+    setCurrentPage(page - 1)
   }
 
   function goToLastPage() {
-    setPage(totalPages)
+    setCurrentPage(totalPages)
   }
 
   return (
@@ -69,7 +118,7 @@ export function AttendeeList() {
         <div className="px-3 w-72 py-1.5 border border-white/10 rounded-lg text-sm flex items-center gap-3">
           <Search className="size-4 text-emerald-300" />
           <input
-            className="bg-transparent flex-1 outline-none border-0 p-0 text-sm"
+            className="bg-transparent flex-1 outline-none border-0 p-0 text-sm focus:ring-0"
             placeholder="Find attendee..."
             onChange={onSearchChanged}
             value={search}
@@ -83,7 +132,7 @@ export function AttendeeList() {
             <TableHeader style={{ width: 48 }}>
               <input
                 type="checkbox"
-                className="size-4 bg-black/20 rounded border border-white/10"
+                className="size-4 bg-black/20 rounded border border-white/10 focus:ring-0"
               />
             </TableHeader>
             <TableHeader>Code</TableHeader>
@@ -101,7 +150,7 @@ export function AttendeeList() {
                 <TableCell>
                   <input
                     type="checkbox"
-                    className="size-4 bg-black/20 rounded border border-white/10 "
+                    className="size-4 bg-black/20 rounded border border-white/10 focus:ring-0"
                   />
                 </TableCell>
                 <TableCell>{attendee.id}</TableCell>
@@ -136,7 +185,7 @@ export function AttendeeList() {
         <tfoot>
           <tr>
             <TableCell className="py-3 px-4 text-sm text-zinc-300" colSpan={3}>
-              Showing 10 out of {attendees.length} items
+              Showing {attendees.length} out of {total} items
             </TableCell>
             <TableCell className="text-right" colSpan={3}>
               <div className="inline-flex items-center gap-8">

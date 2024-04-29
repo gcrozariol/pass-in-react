@@ -12,7 +12,7 @@ export default function ErrorPage() {
     <div className="flex h-screen text-center">
       <div className="flex flex-col justify-center mx-auto">
         <p>
-          Error |{' '}
+          Error | {/* @ts-expect-error: React Router unknown property */}
           <span className="font-bold">{error.statusText || error.message}</span>
         </p>
         <br />

@@ -9,11 +9,11 @@ import {
   MoreHorizontal,
   Search,
 } from 'lucide-react'
-import { IconButton } from './icon-button'
-import { Table } from './table/table'
-import { TableHeader } from './table/table-header'
-import { TableCell } from './table/table-cell'
-import { TableRow } from './table/table-row'
+import { IconButton } from './components/icon-button'
+import { Table } from './components/table/table'
+import { TableHeader } from './components/table/table-header'
+import { TableCell } from './components/table/table-cell'
+import { TableRow } from './components/table/table-row'
 
 dayjs.extend(relativeTime)
 
@@ -25,7 +25,7 @@ interface Attendees {
   checkedInAt: string | null
 }
 
-export function AttendeeList() {
+export function Attendees() {
   const [search, setSearch] = useState(() => {
     const url = new URL(window.location.toString())
 
@@ -154,7 +154,7 @@ export function AttendeeList() {
                   />
                 </TableCell>
                 <TableCell>{attendee.id}</TableCell>
-                <TableCell>
+                <TableCell className="w-[440px]">
                   <div className="flex flex-col gap-1">
                     <span className="font-semibold text-white">
                       {attendee.name}
@@ -185,12 +185,12 @@ export function AttendeeList() {
         <tfoot>
           <tr>
             <TableCell className="py-3 px-4 text-sm text-zinc-300" colSpan={3}>
-              Showing {attendees.length} out of {total} items
+              Showing {attendees.length} of {total} items
             </TableCell>
             <TableCell className="text-right" colSpan={3}>
               <div className="inline-flex items-center gap-8">
                 <span>
-                  Page {page} out of {totalPages}
+                  Page {page} of {totalPages}
                 </span>
                 <div className="flex gap-1.5">
                   <IconButton onClick={goToFirstPage} disabled={page === 1}>

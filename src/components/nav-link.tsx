@@ -1,9 +1,9 @@
-import { ComponentProps } from 'react'
+import { Link, LinkProps } from 'react-router-dom'
 
-interface NavLinkInterface extends ComponentProps<'a'> {
+interface NavLinkInterface extends LinkProps {
   children: React.ReactNode
 }
 
 export function NavLink(props: NavLinkInterface) {
-  return <a {...props} className="font-medium text-sm text-zinc-300" />
+  return <Link {...props} className="font-medium text-sm text-zinc-300" />
 }
